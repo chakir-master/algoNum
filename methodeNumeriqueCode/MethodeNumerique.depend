@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1578491021 source:c:\users\chakir\desktop\analysecode\analysenumerique2.0\methodenumerique1\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	<ctype.h>
+	<locale.h>
+
