@@ -1003,18 +1003,19 @@ void calcul_matrice_triangulaire(float *t,float *t1, int n, int valmax)
 void operation(float *t,float *t1, int n, int valmax)
 {
     int methode;
-    system("cls");
-    printf("\t\t*       LES METHODES DE RESOLUTION DES SYSTEMES D'EQUATIONS LINEAIRES      *\n");
-    printf("\n1-Gauss sans pivot");
-    printf("\n2-Gauss pivot partiel");
-    printf("\n3-Gauss jordan");
-    printf("\n4-Crout");
-    printf("\n5-Doolittle");
-    printf("\n6-Cholesky");
-    printf("\n7-jacobie");
-    printf("\n8-Gauss-seidel");
-    printf("\nSaisir votre choix :\n\n");
-    methode=saisie_controle(8);
+
+    printf("\t\t*       LES METHODES DE RESOLUTION DES SYSTEMES D'EQUATIONS NON LINEAIRES      *\n");
+    printf("\n\t\t\t1-Gauss sans pivot");
+    printf("\n\t\t\t2-Gauss pivot partiel");
+    printf("\n\t\t\t3-Gauss jordan");
+    printf("\n\t\t\t4-Crout");
+    printf("\n\t\t\tn5-Doolittle");
+    printf("\n\t\t\t6-Cholesky");
+    printf("\n\t\t\t7-jacobie");
+    printf("\n\t\t\t8-Gauss-seidel");
+    printf("\n\t\t\tSaisir votre choix :\n\n");
+    methode = saisie_controle(8);
+
     switch (methode)
     {
         case 1:
@@ -1118,8 +1119,8 @@ int saisie_controle(int max)
     int val,test;
     do
     {
-        printf("Saisir votre choix. (inferieur a %d) :\n",max);
         test=scanf("%d",&val);
+        fflush(stdin);
     }
     while(test==0|| val<0 || val>max);
     return val;
@@ -1288,22 +1289,16 @@ void systeme_equation_lineaire()
 
         system("cls");
         setlocale(LC_CTYPE,"");
-        do
-        {
-            int valmax=20,n;
-            float A[valmax][valmax],B[valmax][valmax];
-            printf("\nRESOLUTION DE SYSTEMES D'EQUATIIONS NON LINEAIRES ");
-            printf("\nAx = B (A etant une matrice carre)");
-            printf("\nSaisir dimension de A :\n");
-            n=saisie_controle(valmax);
-            clear_matrice((float *)A,valmax,n);
-            clear_matrice((float *)B,valmax,2);
-            choix((float *)A,(float *)B,n,valmax);
-            printf("\nVoulez-vous continuer? \nAppuyer N ou n pour quitter:");
-            scanf("%c",&reponse);
-            fflush(stdin);
-        }while(toupper(reponse)!='N');
-
+        int valmax=20,n;
+        float A[valmax][valmax],B[valmax][valmax];
+        printf("\n\nRESOLUTION DE SYSTEMES D'EQUATIIONS NON LINEAIRES ");
+        printf("\nAx = B (A etant une matrice carre)");
+        printf("\nSaisir dimension de A (inferieur a 20) :\n");
+        n = saisie_controle(valmax);
+        clear_matrice((float *)A,valmax,n);
+        clear_matrice((float *)B,valmax,2);
+        choix((float *)A,(float *)B,n,valmax);
+        
         //*****************************************************************************//
         do
         {

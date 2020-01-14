@@ -1,0 +1,17 @@
+[33mcommit f46a9f1afd97b600a4fdc85c1310cf31e28b66e1[m[33m ([m[1;36mHEAD -> [m[1;32msystEqual[m[33m, [m[1;31morigin/systEqual[m[33m)[m
+Author: ALABANI Chakirou <alabanichakirou@gmail.com>
+Date:   Thu Jan 9 00:18:55 2020 +0000
+
+    etat avancé, tests effectue. Dossier W = something
+
+[33mcommit 89a6ff45f7245561f0581a139bab9302e0e2c549[m
+Author: ALABANI Chakirou <alabanichakirou@gmail.com>
+Date:   Thu Jan 9 00:16:14 2020 +0000
+
+    systeme d equation lineaire.. Etat avancé. Reste à faire -> design et corrections
+
+[33mcommit b3911426900973b66ff07ad097bd119611cbc343[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m
+Author: ALABANI Chakirou <alabanichakirou@gmail.com>
+Date:   Wed Jan 8 14:16:50 2020 +0000
+
+    commit intial; etape actuelle:debut de syst d equation lineaire
