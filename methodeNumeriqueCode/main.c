@@ -7,12 +7,8 @@
 
 /// PROTOTYPE DES FONCTIONS
 
-///Equations non-linéiares
-//Generaux...
+///Equations non-lineiares
 void equation_lineaire();
-void systeme_equation_lineaire();
-float saisirEntier(char *message);
-int saisirEntiern(char *message);
 //fonctions
 void dichotomie();
 void lagrange();
@@ -27,20 +23,43 @@ double df(double x);
 float phi(float x);
 float derivee_f(float x);
 
-///Système d'équation linéaire
-//fonctions
-void gauss();
-void gaussPivot();
-void gaussJordan();
-void crout();
-void doolittle();
-void cholesky();
-void jacobi();
-void gaussSeidel();
+///Systeme d'equation lineaire
+void systeme_equation_lineaire();
+//fonctions principales
+void gauss(float a[19][19],float b[19],int n);
+void gaussPivot(float a[19][19],float b[19],int n);
+void gaussJordan(float a[19][19],float b[19],int n);
+void crout(float a[19][19],float b[19],int n);
+void doolittle(float a[19][19],float b[19],int n);
+void cholesky(float a[19][19],float b[19],int n);
+void jacobie(float a[19][19],float b[19],int n);
+void gaussSeidel(float a[19][19],float b[19],int n);
+//fonctions particulieres
+//Saisies
+float saisirEntier(char *message);
+int saisirEntiern(char *message);
+///operations
+float norme(float x[19],int n);
+void saisirMatrice(float A[19][19],float B[19],int n);
+void afficheSysteme(float A[19][19],float B[19],int n);
+void afficheMatrice(float A[19][19],int n);
+void rechercheZero(float A[19][19],float B[19],int n);
+void coMatrices(float A[19][19],float c[19][19],int i,int j,int n);
+float determinant(float A[19][19],int n);
+///Variables globales
+//systeme d equations lineaires
+float A[19][19],B[19];
+int n,i,j;
+char valider;
+//interpolation
 
 
-///Definition de fonctions d'equations non-lineaire
 
+///*********************************************************************
+///************************************************                     *********
+///Definition de fonctions d'equations non-lineaire                     ************************
+///************************************************                     *********
+///*********************************************************************
 float phi(float x)
 {
     float ans;
@@ -59,7 +78,7 @@ double f(double x) //image de la fonction
     return ans;
 }
 
-double df(double x) //inage de la derive
+double df(double x) //image de la derive
 {
     double ans;
     //ans = 3*pow(x,2) - 18*x + 26;
@@ -73,6 +92,9 @@ float derivee_f(float x)
     ans = 2*x -2;
     return ans;
 }
+//*************************
+//Methodes
+//*************************
 
 ///Dichotomie
 void dichotomie()
@@ -329,7 +351,7 @@ void secante()
         {
             a = saisirEntier("\t\tEntrez la valeur de X0 : ");
             b = saisirEntier("\t\tEntrez la valeur de X1 : ");
-            tolerence= saisirEntier("\t\tEntrer le critère d'arrêt : 10^-");
+            tolerence= saisirEntier("\t\tEntrer le critï¿½re d'arrï¿½t : 10^-");
             tolerence= fabs(tolerence);
             tolerence=1/pow(10,tolerence);
             if (a==b) printf("\n\t\tLes valeures initiales sont egales;.... Resaisissez\n");
@@ -431,7 +453,7 @@ void newton()
 
     if(iteration == iter_max)
     {
-        printf("La convergence n'est pas atteinte après %d iterations", iteration);
+        printf("La convergence n'est pas atteinte aprï¿½s %d iterations", iteration);
         exit(10);
     }
 }
@@ -511,14 +533,12 @@ void corde1()
 
     if(iteration == iter_max)
     {
-        printf("La convergence n'est pas atteinte après %d iterations", iteration);
+        printf("La convergence n'est pas atteinte aprï¿½s %d iterations", iteration);
         exit(10);
     }
 }
 
-
 ///Corde2
-
 void corde2()
 {
     double a, b, erreur, x, x_prec, x_init;
@@ -591,7 +611,7 @@ void corde2()
 
     if(iteration == iter_max)
     {
-        printf("La convergence n'est pas atteinte après %d iterations", iteration);
+        printf("La convergence n'est pas atteinte aprï¿½s %d iterations", iteration);
         exit(10);
     }
 }
@@ -600,56 +620,741 @@ void corde2()
 ///****************************************************************************************************************
 ///****************************************************************************************************************
 
-///Definition de fonctions d'equations non-lineaire
-//Gauss sans pivot
-void gauss()
+
+///*********************************************************************
+///************************************************                     *********
+///Definition de fonctions de systeme d equations non-lineaire                   *********
+///************************************************                     *********
+///*********************************************************************
+
+///Fonctions particulieres
+float saisirEntier(char *message)
 {
-    printf("En cours...");
+    float n;
+    int retour;
+    // controle de la saisie
+    do
+    {
+        printf("\n %s",message);
+        retour= scanf(" %f",&n);
+        fflush(stdin);
+    }
+    while(!retour);
+    return n;
 }
 
-//Gauss avec pivot
-void gaussPivot()
+int saisirEntiern(char *message)
 {
-    printf("En cours...");
+
+    int n;
+    int retour;
+    // controle de la saisie
+    do
+    {
+        printf("\n %s",message);
+        retour= scanf(" %d",&n);
+        fflush(stdin);
+    }
+    while(!retour);
+    return n;
+}
+
+float norme(float x[19],int n)
+{
+    float ref;
+    int i;
+    ref=0;
+    for(i=0; i<n; i++) if (x[i]>ref) ref=x[i];
+    return(ref);
+}
+
+
+
+void saisirMatrice(float a[19][19],float b[19],int n)
+{
+    int i,j,retour =0;
+    printf("\n\t\tSaisie de la matrice A:\n\n");
+    for (i=0; i<n; i++)
+    {
+        for (j=0; j<n; j++)
+        {
+            do
+            {
+                printf("\t\tA[%d][%d] = ",i+1,j+1);
+                retour = scanf("%f",&a[i][j]);
+                if(retour == 0)printf("La valeur doit etre reelle.");
+            }
+            while(retour == 0);
+
+        }
+    }
+    retour=0;
+    printf("\n\t\tSaisir le vecteur B:\n\n");
+    for(i=0; i<n; i++)
+    {
+        do
+        {
+            printf("\t\tB[%d] = ",i+1);
+            retour = scanf("%f",&b[i]);
+            if(retour == 0)printf("La valeur doit etre reelle.");
+        }
+        while(retour == 0);
+    }
+}
+
+
+void afficheSysteme(float a[19][19],float b[19],int n)
+{
+    int i,j;
+    printf("\n\n");
+    for (i=0; i<n; i++)
+    {
+        printf("\t\t |");
+        for (j=0; j<n; j++)
+        {
+            printf("%.2f ",a[i][j]);
+        }
+        printf("| | %.2f |",b[i]);
+        printf("\n");
+    }
+}
+
+// fonction d'affichage matrice
+
+void afficheMatrice(float a[19][19],int n)
+{
+    int i,j;
+    printf("\n\n");
+    for (i=0; i<n; i++)
+    {
+        printf("\t\t |");
+        for (j=0; j<n; j++)
+        {
+            printf("%.2f ",a[i][j]);
+        }
+        printf("|\n");
+    }
+}
+
+// Mettre ï¿½ Zero les elements qui doivent etre des zï¿½ro
+
+void rechercheZero(float a[19][19],float b[19],int n)
+{
+    int i,j;
+    float eps=1e-4;
+    for(i=0; i<n; i++)
+    {
+        for (j=0; j<n; j++) if (fabs(a[i][j])<eps) a[i][j]=0;
+        if (fabs(b[i])<eps) b[i]=0;
+    }
+}
+
+void coMatrices(float a[19][19],float c[19][19],int i,int j,int n)
+{
+    int l,k;
+    for(l=0; l<n; l++) for(k=0; k<n; k++)
+        {
+            if ((l<i)&&(k<j)) c[l][k]=a[l][k];
+            if ((l>i)&&(k<j)) c[l-1][k]=a[l][k];
+            if ((l<i)&&(k>j)) c[l][k-1]=a[l][k];
+            if ((l>i)&&(k>j)) c[l-1][k-1]=a[l][k];
+        }
+}
+// calcul du determinant
+
+float determinant(float a[19][19],int n)
+{
+    int k,j;
+    float c[19][19],s;
+
+    k=n-1;
+
+    if(n==0) return(1);
+
+    s=0;
+    for(j=0; j<n; j++)
+    {
+        coMatrices(a,c,k,j,n);
+        s=s+pow(-1,k+j)*a[k][j]*determinant(c,k);
+    }
+    return(s);
+}
+
+
+//****************
+///Methodes
+//****************
+//Gauss sans pivot
+void gauss(float A[19][19],float B[19],int n)
+{
+    float a[19][19],b[19];
+    int cpt,cpt1;
+    for(cpt=0; cpt<n; cpt++)
+    {
+        for(cpt1=0; cpt1<n; cpt1++)
+        {
+            a[cpt][cpt1] = A[cpt][cpt1];
+        }
+    }
+
+    for(cpt=0; cpt<n; cpt++)
+    {
+        b[cpt] = B[cpt];
+    }
+    system("cls");
+    printf("\n\t\t              --------------------------------------           *\n");
+    printf("\t\t              --------------------------------------           *\n");
+    printf("\t\t              | RESOLUTION PAR LA METHODE DE GAUSS |           *\n");
+    printf("\t\t             --------------------------------------           *\n");
+    printf("\t\t              --------------------------------------           *\n");
+
+    float x[19],p,s;
+    int i,j,k;
+
+    for(k=0; k<n-1; k++)
+    {
+        if (a[k][k]==0)
+        {
+            printf("\n\n\tUn des pivots est nul alors la methode de Gauss simple est non applicable, utilisez une autre methode...\n\n");
+        }
+
+        //reduction
+        for(i=k+1; i<n; i++)
+        {
+            p=a[i][k]/a[k][k];
+            for (j=k; j<n; j++) a[i][j]=a[i][j]-p*a[k][j];
+            b[i]=b[i]-p*b[k];
+        }
+    }
+
+    //Resolution
+    for(i=n-1; i>=0; i--)
+    {
+        s=0;
+        for(j=i+1; j<n; j++)s=s+a[i][j]*x[j];
+        x[i]=(b[i]-s)/a[i][i];
+    }
+    rechercheZero(a,b,n);
+    printf("\n\t\tMatrice apres triangularisation :");
+    afficheSysteme(a,b,n);
+    printf("\n\t\tResultat apres la remontee :\n\n");
+    for (i=0; i<n; i++) printf("\t\tX[%d] = %.2f ;\n",i+1,x[i]);
+}
+
+//Gauss avec pivot partiel
+void gaussPivot(float A[19][19],float B[19],int n)
+{
+    system("cls");
+    printf("\n\t\t              ---------------------------------------------------           \n");
+    printf("\t\t             ---------------------------------------------------           \n");
+    printf("\t\t              | RESOLUTION PAR LA METHODE DE GAUSS PIVOT PARTIEL |           \n");
+    printf("\t\t             ---------------------------------------------------           \n");
+    printf("\t\t              ---------------------------------------------------           \n");
+
+    float a[19][19],b[19];
+    int cpt,cpt1;
+    for(cpt=0; cpt<n; cpt++)
+    {
+        for(cpt1=0; cpt1<n; cpt1++)
+        {
+            a[cpt][cpt1] = A[cpt][cpt1];
+        }
+    }
+
+    for(cpt=0; cpt<n; cpt++)
+    {
+        b[cpt] = B[cpt];
+    }
+
+    float x[19],p,s,ref,temp;
+    int i,j,k,ligne;
+
+    for(k=0; k<n-1; k++)
+    {
+    // pivot maximum
+        ref=0;
+        for(i=k; i<n; i++) if(fabs(a[i][k])>ref)
+            {
+                ref=fabs(a[i][k]);
+                ligne=i;
+            }
+
+    // pivot
+        for(j=k; j<n; j++)
+        {
+            temp=a[k][j];
+            a[k][j]=a[ligne][j] ;
+            a[ligne][j]=temp;
+        }
+
+        temp=b[k];
+        b[k]=b[ligne];
+        b[ligne]=temp;
+
+        if (a[k][k]==0)
+        {
+            printf("\n\n\t ??? Un des pivots est nul alors la methode de Gauss pivot partiel est non applicable, utilisez une autre methode...\n\n");
+        }
+
+        //triangularisation
+        for(i=k+1; i<n; i++)
+        {
+            p=a[i][k]/a[k][k];
+            for (j=k; j<n; j++) a[i][j]=a[i][j]-p*a[k][j];
+            b[i]=b[i]-p*b[k];
+        }
+    }
+
+    //Remontee
+    for(i=n-1; i>=0; i--)
+    {
+        s=0;
+        for(j=i+1; j<n; j++) s=s+a[i][j]*x[j];
+        x[i]=(b[i]-s)/a[i][i];
+    }
+    rechercheZero(a,b,n);
+    printf("\n\t\tMatrice apres triangularisation :");
+    afficheSysteme(a,b,n);
+    printf("\n\t\tResultat apres la remontee :\n\n");
+    for (i=0; i<n; i++) printf("\t\tX[%d] = %.2f ;\n",i+1,x[i]);
+    printf("\n");
+
 }
 
 //Gauss Jordan
-void gaussJordan()
+void gaussJordan(float A[19][19],float B[19],int n)
 {
-    printf("En cours...");
+    system("cls");
+    printf("\n\t\t              ---------------------------------------------          \n");
+    printf("\t\t              ---------------------------------------------           \n");
+    printf("\t\t              | RESOLUTION PAR LA METHODE DE GAUSS JORDAN |           \n");
+    printf("\t\t              ---------------------------------------------           \n");
+    printf("\t\t              ---------------------------------------------          \n");
+
+    float a[19][19],b[19];
+    int cpt,cpt1;
+    for(cpt=0; cpt<n; cpt++)
+    {
+        for(cpt1=0; cpt1<n; cpt1++)
+        {
+            a[cpt][cpt1] = A[cpt][cpt1];
+        }
+    }
+
+    for(cpt=0; cpt<n; cpt++)
+    {
+        b[cpt] = B[cpt];
+    }
+
+    float p;
+    int i,j,k;
+
+    for(k=0; k<n; k++)
+    {
+        if (a[k][k]==0)
+        {
+            printf("\n\n\t ??? Un des pivots est nul alors la methode de Gauss pivot partiel est non applicable, utilisez une autre methode...\n\n");
+        }
+
+        p=a[k][k];
+
+        //normalisation
+        for (j=k; j<n; j++) a[k][j]=a[k][j]/p;
+        b[k]=b[k]/p;
+
+        //Remontee
+        for(i=0; i<n; i++)
+        {
+            if (i!=k)
+            {
+                p=a[i][k];
+                for (j=k; j<n; j++) a[i][j]=a[i][j]-p*a[k][j];
+                b[i]=b[i]-p*b[k];
+            }
+        }
+    }
+    rechercheZero(a,b,n);
+    printf("\n\t\tMatrice apres triangularisation :");
+    afficheSysteme(a,b,n);
+    printf("\n\t\tResultat apres la remontee :\n\n");
+    for(i=0; i<n; i++) printf("\t\tX[%d] = %.2f ;\n",i+1,b[i]);
+    printf("\n");
+
 }
 
 //Crout
-void crout()
+void crout(float A[19][19],float B[19],int n)
 {
-    printf("En cours...");
+    system("cls");
+    printf("\n\t\t             ----------------------------------------          \n");
+    printf("\t\t              ----------------------------------------           \n");
+    printf("\t\t              | RESOLUTION PAR LA METHODE DE LU CROUT |           \n");
+    printf("\t\t              ----------------------------------------           \n");
+    printf("\t\t              ----------------------------------------         \n");
+
+    float a[19][19],b[19];
+    int cpt,cpt1;
+    for(cpt=0; cpt<n; cpt++)
+    {
+        for(cpt1=0; cpt1<n; cpt1++)
+        {
+            a[cpt][cpt1] = A[cpt][cpt1];
+        }
+    }
+
+    for(cpt=0; cpt<n; cpt++)
+    {
+        b[cpt] = B[cpt];
+    }
+
+    float L[19][19],U[19][19],x[19],y[19],s;
+    int i,j,k,m;
+
+    for (i=0; i<n; i++) for (j=0; j<n; j++)
+        {
+            if(i==j) U[i][j]=1;
+            else U[i][j]=0;
+            L[i][j]=0;
+        }
+
+    for (m=0; m<n; m++)
+    {
+        for (i=m; i<n; i++)
+        {
+            s=0;
+            for (k=0; k<m; k++) s=s+L[i][k]*U[k][m];
+            L[i][m]=a[i][m]-s;
+        }
+
+        if (L[k][k]==0)
+        {
+            printf("\n\n\t\t* Un mineur nul ! => methode de LU n'est pas applicable. Utilisez une autre methode.\n\n");
+        }
+
+        for (j=m+1; j<n; j++)
+        {
+            s=0;
+            for (k=0; k<m; k++) s=s+L[m][k]*U[k][j];
+            U[m][j]=(a[m][j]-s)/L[m][m];
+        }
+    }
+
+    // Resolution
+    for(i=0; i<n; i++)
+    {
+        s=0;
+        for(j=0; j<i; j++) s=s+L[i][j]*y[j];
+        y[i]=(b[i]-s)/L[i][i];
+    }
+
+    for(i=n-1; i>=0; i--)
+    {
+        s=0;
+        for(j=i+1; j<n; j++)s=s+U[i][j]*x[j];
+        x[i]=(y[i]-s)/U[i][i];
+    }
+
+    printf("\n\t\t* A = L * U \n");
+    printf("\n\t\t* Matrice Lower L :");
+    afficheMatrice(L,n);
+    printf("\n\t\t* Matrice Upper U :");
+    afficheMatrice(U,n);
+    printf("\n\t\t* Resultat :\n\n");
+    for (i=0; i<n; i++) printf("\t\tX[%d] = %.2f ;\n",i+1,x[i]);
 }
 
 //Doolittle
-void doolittle()
+void doolittle(float A[19][19],float B[19],int n)
 {
-    printf("En cours...");
+    system("cls");
+    printf("\n\t\t              ---------------------------------------------        \n");
+    printf("\t\t              ---------------------------------------------           \n");
+    printf("\t\t              | RESOLUTION PAR LA METHODE DE LU DOOLITTLE |           \n");
+    printf("\t\t              ---------------------------------------------           \n");
+    printf("\t\t              ---------------------------------------------          \n");
+
+    float a[19][19],b[19];
+    int cpt,cpt1;
+
+    for(cpt=0; cpt<n; cpt++)
+    {
+        for(cpt1=0; cpt1<n; cpt1++)
+        {
+            a[cpt][cpt1] = A[cpt][cpt1];
+        }
+    }
+
+    for(cpt=0; cpt<n; cpt++)
+    {
+        b[cpt] = B[cpt];
+    }
+
+    float L[19][19],U[19][19],x[19],y[19],s;
+    int i,j,k,m;
+
+    for (i=0; i<n; i++) for (j=0; j<n; j++)
+        {
+            if(i==j) L[i][j]=1;
+            else L[i][j]=0;
+            U[i][j]=0;
+        }
+
+    for (m=0; m<n; m++)
+    {
+        for (j=m; j<n; j++)
+        {
+            s=0;
+            for (k=0; k<m; k++) s=s+L[m][k]*U[k][j];
+            U[m][j]=a[m][j]-s;
+        }
+        if (U[k][k]==0)
+        {
+            printf("\n\n\t\tUn mineur nul ! => methode de LU non applicable\n\n");
+        }
+
+        for (i=m+1; i<n; i++)
+        {
+            s=0;
+            for (k=0; k<m; k++) s=s+L[i][k]*U[k][m];
+            L[i][m]=(a[i][m]-s)/U[m][m];
+        }
+    }
+
+    // resolution
+    for(i=0; i<n; i++)
+    {
+        s=0;
+        for(j=0; j<i; j++) s=s+L[i][j]*y[j];
+        y[i]=(b[i]-s)/L[i][i];
+    }
+
+    for(i=n-1; i>=0; i--)
+    {
+        s=0;
+        for(j=i+1; j<n; j++)s=s+U[i][j]*x[j];
+        x[i]=(y[i]-s)/U[i][i];
+    }
+
+    printf("\n\t\t * A = L * U \n");
+    printf("\n\t\t* La matrice Lower L :");
+    afficheMatrice(L,n);
+    printf("\n\t\t* La matrice Upper U :");
+    afficheMatrice(U,n);
+    printf("\n\n\t\tResultat :\n\n");
+    for (i=0; i<n; i++) printf("\t\tX[%d] = %f ;\n",i+1,x[i]);
 }
 
+
 //Cholesky
-void cholesky()
+void cholesky(float A[19][19],float B[19],int n)
 {
-    printf("En cours...");
+    system("cls");
+    printf("\n\t\t             -----------------------------------------          \n");
+    printf("\t\t              -----------------------------------------           \n");
+    printf("\t\t              | RESOLUTION PAR LA METHODE DE CHOLESKY |           \n");
+    printf("\t\t              -----------------------------------------           \n");
+    printf("\t\t              -----------------------------------------         \n");
+
+    float a[19][19],b[19];
+    int cpt,cpt1;
+    for(cpt=0; cpt<n; cpt++)
+    {
+        for(cpt1=0; cpt1<n; cpt1++)
+        {
+            a[cpt][cpt1] = A[cpt][cpt1];
+        }
+    }
+
+    for(cpt=0; cpt<n; cpt++)
+    {
+        b[cpt] = B[cpt];
+    }
+
+    float L[19][19],Lt[19][19],x[19],y[19],s,p;
+    int i,j,k;
+
+    // verification de le symetrie
+    for (i=0; i<n; i++) for (j=0; j<n; j++)
+            if (a[i][j]!=a[j][i])
+            {
+                printf("\n\n\t\t* Matrice non symetrique => methode de Cholesky non applicable; saisir une autre matrice ou changer de methode\n\n");
+            }
+
+    for (i=0; i<n; i++) for (j=0; j<n; j++) L[i][j]=0;
+
+    for (i=0; i<n; i++)
+    {
+        s=0;
+        for (k=0; k<i; k++) s=s+pow(L[i][k],2);
+        p=a[i][i]-s;
+
+        if (p<=0)
+        {
+            printf("\n\n\t\t* Matrice non definie positive => methode de Cholesky non applicable; saisir une autre matrice ou changer de methode\n\n");
+        }
+
+        L[i][i]=sqrt(p);
+
+        for(j=i+1; j<n; j++)
+        {
+            s=0;
+            for (k=0; k<i; k++) s=s+L[i][k]*L[j][k];
+            L[j][i]=(a[j][i]-s)/L[i][i];
+        }
+    }
+
+    for (i=0; i<n; i++) for (j=0; j<n; j++) Lt[i][j]=L[j][i];
+
+    // resolution
+    for(i=0; i<n; i++)
+    {
+        s=0;
+        for(j=0; j<i; j++) s=s+L[i][j]*y[j];
+        y[i]=(b[i]-s)/L[i][i];
+    }
+
+    for(i=n-1; i>=0; i--)
+    {
+        s=0;
+        for(j=i+1; j<n; j++) s=s+Lt[i][j]*x[j];
+        x[i]=(y[i]-s)/Lt[i][i];
+    }
+
+    printf("\n\t\t A = L * Lt \n");
+    printf("\n\t\t La matrice L :");
+    afficheMatrice(L,n);
+    printf("\n\t\t La matrice Lt :");
+    afficheMatrice(Lt,n);
+    printf("\n\t\t* Resultat :\n\n");
+    for (i=0; i<n; i++) printf("\t\tX[%d] = %.2f ;\n",i+1,x[i]);
 }
 
 //Jacobi
-void jacobi()
+void jacobie(float A[19][19],float B[19],int n)
 {
-    printf("En cours...");
+    system("cls");
+    printf("\n\t\t*            ----------------------------------------          *\n");
+    printf("\t\t*              ----------------------------------------           *\n");
+    printf("\t\t*              | RESOLUTION PAR LA METHODE DE JACOBIE |           *\n");
+    printf("\t\t*              ----------------------------------------           *\n");
+    printf("\t\t*              ----------------------------------------          *\n\n");
+
+    float a[19][19],b[19];
+    int cpt,cpt1;
+    for(cpt=0; cpt<n; cpt++)
+    {
+        for(cpt1=0; cpt1<n; cpt1++)
+        {
+            a[cpt][cpt1] = A[cpt][cpt1];
+        }
+    }
+
+    for(cpt=0; cpt<n; cpt++)
+    {
+        b[cpt] = B[cpt];
+    }
+
+    float x[19],x1[19],x2[19],s,eps=1e-4;
+    int i,j,k,iter=0;
+
+    //saisie x0
+    printf("\n\t\t  Veuillez saisir le vecteur solution X0 : \n\n");
+    for (i=0; i<n; i++)
+    {
+        printf("\t\tX(0)[%d]= ",i+1);
+        scanf("%f",&x1[i]);
+    }
+
+    do
+    {
+        for(i=0; i<n; i++)
+        {
+            s=0;
+            for (j=0; j<n; j++) if (i!=j) s=s+a[i][j]*x1[j];
+            x2[i]=(b[i]-s)/a[i][i];
+        }
+        for (k=0; k<n; k++)
+        {
+            x[k]=fabs(x1[k]-x2[k]);
+            x1[k]=x2[k];
+        }
+
+        iter++;
+    }
+    while (norme(x,n)>eps) ;
+
+    printf("\n\t\t* Resultat :\n\n");
+    for (i=0; i<n; i++) printf("\t\tX[%d] = %f ;\n",i+1,x2[i]);
+    printf("\n\t\t* %d iterations,  10^-4 pres \n",iter);
 }
 
 //Gauss Seidel
-void gaussSeidel()
+void gaussSeidel(float A[19][19],float B[19],int n)
 {
-    printf("En cours...");
+    system("cls");
+    printf("\n\t\t*            --------------------------------------------      *\n");
+    printf("\t\t*              --------------------------------------------           *\n");
+    printf("\t\t*              | RESOLUTION PAR LA METHODE DE GAUSS SEIDEL |           *\n");
+    printf("\t\t*              --------------------------------------------           *\n");
+    printf("\t\t*              ---------------------------------------------      *\n\n");
+
+    float a[19][19],b[19];
+    int cpt,cpt1;
+    for(cpt=0; cpt<n; cpt++)
+    {
+        for(cpt1=0; cpt1<n; cpt1++)
+        {
+            a[cpt][cpt1] = A[cpt][cpt1];
+        }
+    }
+
+    for(cpt=0; cpt<n; cpt++)
+    {
+        b[cpt] = B[cpt];
+    }
+
+    float x[19],x1[19],x2[19],s,p,eps=1e-4;
+    int i,j,k,iter=0;
+
+    //initialisation du vecteur
+    printf("\n\t\t* Veuillez saisir le vecteur solution X0 : \n\n");
+    for (i=0; i<n; i++)
+    {
+        printf("\t\tX(0)[%d]= ",i+1);
+        scanf("%f",&x1[i]);
+    }
+
+    do
+    {
+        for(i=0; i<n; i++)
+        {
+            s=0;
+            p=0;
+            for (j=i+1; j<n; j++) s=s+a[i][j]*x1[j];
+            for (j=0; j<i; j++) p=p+a[i][j]*x2[j];
+            x2[i]=(b[i]-s-p)/a[i][i];
+        }
+        for (k=0; k<n; k++)
+        {
+            x[k]=fabs(x1[k]-x2[k]);
+            x1[k]=x2[k];
+        }
+
+        iter++;
+    }
+    while (norme(x,n)>eps) ;
+
+    printf("\n\t\t* Resultat :\n\n");
+    for (i=0; i<n; i++) printf(" X_%d = %.2f ;\n",i+1,x2[i]);
+    printf("\n\t\t %d iterationS, 10^-4 pres. \n",iter);
 }
 
-///FIN S-E-L
+
+///*********************************************************************
+///************************************************                     *********
+///FIN S-E-L                                                               *********
+///************************************************                     *********
+///*********************************************************************
 
 
 ///**********main() - equation non lineaire
@@ -722,110 +1427,99 @@ void equation_lineaire()
 
 }
 
-
 ///**********main() - systeme d'equa lineaire
 void systeme_equation_lineaire()
 {
-    int choix_met;
+    int choix_met, retour;
     char rep;
-    do{
-             system("cls");
-
-    printf("\t\t*       LES METHODES DE RESOLUTION DES SYSTEMES D'EQUATIONS LINEAIRES      *\n");
-
-    printf("\n\t\t\t1- Gauss sans pivot");
-    printf("\n\t\t\t2- Gauss avec pivot");
-    printf("\n\t\t\t3- Gauss Jordan");
-    printf("\n\t\t\t4- CROUT");
-    printf("\n\t\t\t5- Doolittle");
-    printf("\n\t\t\t6- Cholesky");
-    printf("\n\t\t\t7- Jacobi");
-    printf("\n\t\t\t8- Gauss Seidel");
-
+    system("cls");
+    printf("\t\t*       LES METHODES DE RESOLUTION DES SYSTEMES EQUATIONS LINEAIRES      *\n\n");
     do
     {
-        printf("\n\n\t\tVotre choix : ");
-        scanf("%d", &choix_met);
+        printf("\n\n\t\tVeuillez saisir le nombre de ligne de la matrice : ");
+        retour = scanf("%d",&n);
         fflush(stdin);
+        if(retour==0) printf("\t\tLe nombre de ligne doit etre un reel. Veuillez ressaisir : ");
     }
-    while( choix_met < 1 || choix_met > 8);
+    while(retour == 0);
 
-    switch(choix_met)
-    {
-    case 1 :
-        gauss();
-        break;
-    case 2 :
-        gaussPivot();
-        break;
-    case 3 :
-        gaussJordan();
-        break;
-    case 4 :
-        crout();
-        break;
-    case 5 :
-        doolittle();
-        break;
-    case 6 :
-        cholesky();
-        break;
-    case 7 :
-        jacobi();
-        break;
-    case 8 :
-        gaussSeidel();
-    }
+    saisirMatrice(A,B,n);
+    printf("\n\n\t\tAffichage du systeme : ");
+    afficheSysteme(A,B,n);
     do
+    {
+        printf("\n\t\t*       LES METHODES DE RESOLUTION DES SYSTEMES D'EQUATIONS LINEAIRES      *\n\n");
+        printf("\n\t\t\t1- Gauss sans pivot");
+        printf("\n\t\t\t2- Gauss avec pivot");
+        printf("\n\t\t\t3- Gauss Jordan");
+        printf("\n\t\t\t4- CROUT");
+        printf("\n\t\t\t5- Doolittle");
+        printf("\n\t\t\t6- Cholesky");
+        printf("\n\t\t\t7- Jacobi");
+        printf("\n\t\t\t8- Gauss Seidel");
+
+        do
         {
-            printf("\n\n\t\tRevenir au Menu des methodes non lineaire(O/N) ? : ");
+            printf("\n\n\t\tVeuillez choisir une methode : ");
+            scanf("%d", &choix_met);
+            fflush(stdin);
+        }
+        while( choix_met < 1 || choix_met > 8);
+
+        switch(choix_met)
+        {
+        case 1 :
+            gauss(A,B,n);
+            break;
+        case 2 :
+            gaussPivot(A,B,n);
+            break;
+        case 3 :
+            gaussJordan(A,B,n);
+            break;
+        case 4 :
+            crout(A,B,n);
+            break;
+        case 5 :
+            doolittle(A,B,n);
+            break;
+        case 6 :
+            cholesky(A,B,n);
+            break;
+        case 7 :
+            jacobie(A,B,n);
+            break;
+        case 8 :
+            gaussSeidel(A,B,n);
+            break;
+        }
+
+        do
+        {
+            fflush(stdin);
+            printf("\n\n\t\tVoulez-vous revenir au menu des systemes d equations non-lineaires (O/N) ? : ");
             scanf("%c", &rep);
             fflush(stdin);
             rep = toupper(rep);
             while(rep != 'O' && rep != 'N')
             {
-                printf("\t\tveuillez saisir soit O (Oui) soit N (Non) : ");
+                printf("\t\tSaisissez o/O pour Oui ou n/N pour Non : ");
                 scanf("%c", &rep);
                 fflush(stdin);
                 rep = toupper(rep);
             }
-        }while(rep != 'O' && rep != 'N');
+        }
+        while(rep != 'O' && rep != 'N');
+        system("cls");
     }
     while(rep=='O');
 }
 
-
-float saisirEntier(char *message)
-{
-    float n;
-    int retour;
-    // controle de la saisie
-    do
-    {
-        printf("\n %s",message);
-        retour= scanf(" %f",&n);
-        fflush(stdin);
-    }
-    while(!retour);
-    return n;
-}
-
-int saisirEntiern(char *message)
-{
-    int n;
-    int retour;
-    // controle de la saisie
-    do
-    {
-        printf("\n %s",message);
-        retour= scanf(" %d",&n);
-        fflush(stdin);
-    }
-    while(!retour);
-    return n;
-}
-
-
+///*************************************************************************************************************************
+///*************************************************************************************************************************
+///Main principal-----------------------------------------------------------------------------------------------------------
+///*************************************************************************************************************************
+///*************************************************************************************************************************
 
 
 
@@ -836,13 +1530,12 @@ int main()
     char choix_ini;
     char rep;
     do{
-             system("cls");
-
-  ;
+    system("cls");
     printf("\n\t\t*                LES METHODES NUMERIQUES                  *\n");
-
     printf("\n\t\t\tA- Equation non lineaire ");
     printf("\n\t\t\tB- Systeme d'equation lineaire");
+    printf("\n\t\t\tC- Interpolations");
+    printf("\n\t\t\tD- Equation differentiel");
 
     do
     {
@@ -881,4 +1574,3 @@ int main()
     while(rep=='O');
     return 0;
 }
-
