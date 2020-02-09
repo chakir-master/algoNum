@@ -51,7 +51,24 @@ float determinant(float A[19][19],int n);
 float A[19][19],B[19];
 int n,i,j;
 char valider;
-//interpolation
+
+///Interpolation lineaire
+void interpolation();
+//fonctions principales
+void Newton(int n, float* x, float* y);
+void Lagrange(int n,float* x, float* y);
+void Moindre(int n, float* x, float* y);
+///fonctions particulieres
+float* AllocatVect(int n);
+float** AllocatMat(int ligne, int colonne);
+void SaisieDeDonnees(int n,float* x, float* y);
+float* choleskyInter(float** Mat,float* b,int n);
+int ctrsaisieint(void);
+float ctrsaisiefloat(void);
+float* CalculCoefDePhi(int n,float* x, float* y);
+float* CalculCoefDep(int n, float* x, float* y,int p);
+float** CalculDiffDiv(int n, float* x, float* y);
+float* CalculCoefDeN(int n, float* x, float* y);
 
 
 
@@ -1356,6 +1373,414 @@ void gaussSeidel(float A[19][19],float B[19],int n)
 ///************************************************                     *********
 ///*********************************************************************
 
+///*********************************************************************
+///************************************************                     *********
+///Definition de fonctions d interpolation lineaire                            *********
+///************************************************                     *********
+///*********************************************************************
+
+float* AllocatVect(int n)
+{
+    float* Vect = (float*) malloc(sizeof(float)*n);
+    if(Vect == NULL)
+    {
+        printf("Memoire insuffisante pour continuer!\n");
+        exit(EXIT_FAILURE);
+    }
+    return Vect;
+}
+
+float** AllocatMat(int ligne, int colonne)
+{
+    float** Mat = malloc(sizeof(float*)*ligne);
+    int i;
+    for(i = 0; i<ligne; i++)
+    {
+        Mat[i] = (float*)malloc(sizeof(float)*colonne);
+        if(Mat[i]==NULL)
+        {
+            printf("Memoire insuffisante pour continuer !");
+            exit(EXIT_FAILURE);
+        }
+    }
+    return Mat;
+}
+
+void SaisieDeDonnees (int n,float* x, float* y)
+{
+    int i;
+    for(i=0; i<n; i++)
+    {
+        printf("Saisir x%d:\t",i);
+        x[i] = ctrsaisiefloat();
+        printf("Saisir y%d:\t",i);
+        y[i] = ctrsaisiefloat();
+        printf("\n");
+    }
+
+    printf("\n\n\t Coordonn�es saisie :\n\n");
+    for(i=0; i<n; i++)
+    {
+        printf("\n\tx%d = %2.2f\t|\ty%d = %2.2f\n\n-------------------------------------------------------\n", i, x[i], i, y[i]);
+    }
+}
+
+float* choleskyInter(float** Mat,float* b,int n)
+{
+    float** L=AllocatMat(n,n);
+    float** Lt=AllocatMat(n,n);
+    float* x=AllocatVect(n);
+    float* y=AllocatVect(n);
+    float s,p;
+    int i,j,k;
+
+    // v�rification de le sym�trie
+    for (i=0; i<n; i++) for (j=0; j<n; j++)
+            if (Mat[i][j]!=Mat[j][i])
+            {
+                printf("\n\n * La matrice saisie n est pas symetrique ,la methode de cholesky n est donc applicable\n");
+                exit(EXIT_FAILURE);
+            }
+
+    for (i=0; i<n; i++) for (j=0; j<n; j++) L[i][j]=0;
+
+    for (i=0; i<n; i++)
+    {
+        s=0;
+        for (k=0; k<i; k++) s=s+pow(L[i][k],2);
+        p=Mat[i][i]-s;
+
+        if (p<=0)
+        {
+            printf("\n\n * LA matrice saisie n est pas definie positive par consequent la methode de Cholesky n est pas applicable\n\n");
+            exit(EXIT_FAILURE);
+        }
+
+        L[i][i]=sqrt(p);
+
+        for(j=i+1; j<n; j++)
+        {
+            s=0;
+            for (k=0; k<i; k++) s=s+L[i][k]*L[j][k];
+            L[j][i]=(Mat[j][i]-s)/L[i][i];
+        }
+    }
+
+    for (i=0; i<n; i++) for (j=0; j<n; j++) Lt[i][j]=L[j][i];
+
+    // resolution
+    for(i=0; i<n; i++)
+    {
+        s=0;
+
+        for(j=0; j<i; j++) s=s+L[i][j]*y[j];
+        y[i]=(b[i]-s)/L[i][i];
+    }
+
+    for(i=n-1; i>=0; i--)
+    {
+        s=0;
+        for(j=i+1; j<n; j++) s=s+Lt[i][j]*x[j];
+        x[i]=(y[i]-s)/Lt[i][i];
+    }
+    return x;
+}
+int ctrsaisieint(void)
+{
+
+    int ok;
+    char f[100];
+    do
+    {
+        int i;
+        fflush(stdin);
+        ok=scanf("%[^\n]",f);
+        int taille=strlen(f);
+        fflush(stdin);
+        for(i=0; i<taille; i++)
+        {
+
+            if(!isdigit(f[i]))
+            {
+                ok = 0;
+                printf("Saisie invalide\n");
+                break;
+            }
+        }
+        fflush(stdin);
+    }
+    while(ok!=1);
+    return (int) atoi(f);
+}
+
+float ctrsaisiefloat(void)
+{
+    int ok;
+    char f[100];
+    do
+    {
+        int point = 0, tiret = 0;
+        int i;
+
+        ok=scanf("%[^\n]",f);
+        int taille=strlen(f);
+        fflush(stdin);
+        for(i=0; i<taille; i++)
+        {
+
+            if(!(isdigit(f[i]) || f[i]=='.' || f[i]=='f' || f[i]=='-'))
+            {
+                ok = 0;
+                printf("Saisie invalide\n");
+                                            break;
+            }
+
+            if(f[i]=='.')
+            {
+                point++;
+            }
+            if(f[i]=='-')
+            {
+                tiret++;
+            }
+
+            if(point>1 || tiret>1 || !(isdigit(f[i]) || f[i]=='.' || f[i]=='f' || f[i]=='-'))
+            {
+                printf("Saisie invalide\n");
+                ok=0;
+                break;
+            }
+        }
+        fflush(stdin);
+    }
+    while(ok!=1);
+    return (float) atof(f);
+}
+
+float* CalculCoefDePhi(int n,float* x, float* y)
+{
+    float* tab = AllocatVect(n);
+    int i,j;
+    for(i=0; i<n; i++)
+    {
+        tab[i]=1;
+        for(j=0; j<n; j++)
+        {
+            if(i!=j)
+            {
+                tab[i] *= (x[i] - x[j]);
+            }
+        }
+        tab[i] = y[i]/tab[i];
+
+    }
+    return tab;
+}
+
+float* CalculCoefDep(int n, float* x, float* y,int p)
+{
+    float** P = AllocatMat(p+1,p+1);
+    float* A = AllocatVect(p+1);
+    float* B = AllocatVect(p+1);
+    int i, j, k;
+    int q = 2*p, m, l = p;
+    for(i=0;i<p+1;i++)
+    {
+        m = q;
+
+        for(j=0;j<p+1;j++)
+        {
+            P[i][j] = 0;
+            for(k=0;k<n;k++)
+            {
+                P[i][j] += pow(x[k],m);
+            }
+            m--;
+        }
+        q--;
+    }
+    for(i=0;i<p+1;i++)
+    {
+        B[i] = 0;
+        for(k=0;k<n;k++)
+        {
+            B[i] += pow(x[k],l)*y[k];
+        }
+        l--;
+    }
+    A = choleskyInter(P, B, p+1);
+    return A;
+}
+
+float** CalculDiffDiv(int n, float* x, float* y)
+{
+    float** tab = AllocatMat(n,n);
+    int i,j;
+    for(i = 0; i<n; i++)
+    {
+        tab[i][0] = y[i];
+    }
+    for(j = 1; j<n; j++)
+    {
+        for(i = j; i < n; i++)
+        {
+            tab[i][j] = (tab[i-1][j-1] - tab[i][j-1])/(x[0] - x[j]);
+        }
+
+    }
+
+    return tab;
+}
+
+float* CalculCoefDeN(int n, float* x, float* y)
+{
+    float** diffDIV = AllocatMat(n,n);
+    float* tab = AllocatVect(n);
+    diffDIV = CalculDiffDiv(n, x, y);
+    int i,j;
+    for(j = 0; j<n; j++)
+    {
+        for(i = j; i < n; i++)
+        {
+            tab[i] = diffDIV[i][j];
+        }
+    }
+    return tab;
+}
+
+//****************
+///Methodes
+//****************
+
+///Lagrange
+void Lagrange(int n,float* x, float* y)
+{
+    
+    printf("\n\t\t-------------------------------------------------------\n");
+    printf("\t\t-------------------------------------------------------\n");
+    printf("\t\t  INTERPOLATION LINEAIRE PAR LA METHODE DE LAGRANGE   \n");
+    printf("\t\t-------------------------------------------------------\n");
+    printf("\t\t-------------------------------------------------------\n\n");
+
+    float* CoefDePhi = CalculCoefDePhi(n,x,y);
+    int i,j;
+    printf(" \nPolynome d'interpolation de LAGRANGE :\n\n");
+    printf("P%d(x)  = ",n);
+
+    for(i=0; i<n; i++)
+    {
+        if(CoefDePhi[i]>0)
+        {
+            printf("(%.2f)",CoefDePhi[i]);
+            for(j=0; j<n; j++)
+            {
+                if(i!=j)
+                {
+                    printf("(x-(%.2f))",x[j]);
+                }
+
+            }
+            if(i!=(n-1))
+            {
+                printf("+");
+            }
+        }
+        else
+        {
+            printf("(%.2f)",(-CoefDePhi[i]));
+            for(j=0; j<n; j++)
+            {
+                if(i!=j)
+                {
+                    printf("(-x+(%.2f))",x[j]);
+                }
+
+            }
+            if(i!=(n-1))
+            {
+                printf("+");
+            }
+        }
+    }
+}
+
+//Newton
+void Newton(int n, float* x, float* y)
+{
+    
+    printf("\n\t\t-------------------------------------------------------\n");
+    printf("\t\t-------------------------------------------------------\n");
+    printf("\t\t  INTERPOLATION LINEAIRE PAR LA METHODE DE NEWTON   \n");
+    printf("\t\t-------------------------------------------------------\n");
+    printf("\t\t-------------------------------------------------------\n\n");
+    float* tabAlpha = AllocatVect(n);
+    tabAlpha = CalculCoefDeN(n, x, y);
+    int i,j;
+    printf("\nLe Polynome d'interpolation :\n\n");
+    printf("P(x)=(%.2f)+",tabAlpha[0]);
+    for(i = 1; i < n; i++)
+    {
+        if(tabAlpha[i]>0)
+        {
+            printf("(%.2f)", tabAlpha[i]);
+            for(j = 0; j < i; j++)
+            {
+                printf("(x-(%.2f))",x[j]);
+            }
+            if(i!=(n-1))
+            {
+                printf("+");
+            }
+        }
+        else
+        {
+            printf("%.2f", tabAlpha[i]);
+            for(j = 0; j < i; j++)
+            {
+                printf("(-x+(%.2f))",-x[j]);
+            }
+            if(i!=(n-1))
+            {
+                printf("+");
+            }
+        }
+
+    }
+}
+
+//Moindres carres
+void Moindre(int n, float* x, float* y)
+{
+    printf("\n\t\t------------------------------------------------------------\n");
+    printf("\t\t-------------------------------------------------------------\n");
+    printf("\t\t  INTERPOLATION LINEAIRE PAR LA METHODE DE MOINDRES CARREES   \n");
+    printf("\t\t------------------------------------------------------------\n");
+    printf("\t\t------------------------------------------------------------\n\n");
+    
+    int i,p,puis;
+    do
+    {
+        printf("Saisir le degre du polynome\n");
+        p = ctrsaisieint();
+        if(p<1 || p>n)printf("p ne peut prendre cette valeur!");
+    }while(p<1 || p>n);
+    puis = p;
+    float* A = CalculCoefDep(n, x, y,p);
+    printf("\nLe Polynome d'interpolation des moindres carrees: \n");
+    printf("\tP(x) =");
+    for(i=0;i<p+1;i++)
+    {
+        printf("%.2fx^%d+", A[i], puis);
+        puis--;
+    }
+}
+
+///*********************************************************************
+///************************************************                     *********
+///FIN Interpolation-L                                                               *********
+///************************************************                     *********
+///*********************************************************************
+
 
 ///**********main() - equation non lineaire
 void equation_lineaire()
@@ -1515,6 +1940,76 @@ void systeme_equation_lineaire()
     while(rep=='O');
 }
 
+///**********main() - intepolation lineaire
+void interpolation()
+{
+    int n, choix_met, retour;
+    char rep;
+    system("cls");
+    setlocale(LC_CTYPE,"");
+    printf("\n\t\t      INTERPOLATION LINEAIRES      \n\n");
+    do
+    {
+        printf("\n\n\t\tVeuillez saisir le degre du systeme : ");
+        retour = scanf("%d",&n);
+        fflush(stdin);
+        if(retour==0) printf("\t\tSaisir une valeur reelle : ");
+    }
+    while(retour == 0);
+    n++;
+    float* x = AllocatVect(n);//tableau de xi
+    float* y = AllocatVect(n);//tableau de yi
+    SaisieDeDonnees(n,x,y);
+    fflush(stdin);
+    do
+    {
+        printf("\n\t\t*       LES METHODES D INTERPOLATIONS LINEAIRES      *\n");
+        printf("\n\t\t\t1- METHODE DE LAGRANGE");
+        printf("\n\t\t\t2- METHODE DE NEWTON");
+        printf("\n\t\t\t3- METHODE DES MOINDRES CARREES");
+
+        do
+        {
+            printf("\n\n\t\tVeuillez choisir une methode : ");
+            scanf("%d", &choix_met);
+            fflush(stdin);
+        }
+        while( choix_met < 1 || choix_met > 3);
+
+        switch(choix_met)
+        {
+        case 1 :
+            Lagrange(n, x, y);;
+            break;
+        case 2 :
+            Newton(n, x, y);
+            break;
+        case 3 :
+            Moindre(n, x, y);
+            break;
+        }
+
+        do
+        {
+            fflush(stdin);
+            printf("\n\n\t\tVoulez-vous revenir au menu des interpolationslineaires (O/N) ? : ");
+            scanf("%c", &rep);
+            fflush(stdin);
+            rep = toupper(rep);
+            while(rep != 'O' && rep != 'N')
+            {
+                printf("\t\tSaisissez o/O pour Oui ou n/N pour Non : ");
+                scanf("%c", &rep);
+                fflush(stdin);
+                rep = toupper(rep);
+            }
+        }
+        while(rep != 'O' && rep != 'N');
+        system("cls");
+    }
+    while(rep=='O');
+}
+
 ///*************************************************************************************************************************
 ///*************************************************************************************************************************
 ///Main principal-----------------------------------------------------------------------------------------------------------
@@ -1535,7 +2030,7 @@ int main()
     printf("\n\t\t\tA- Equation non lineaire ");
     printf("\n\t\t\tB- Systeme d'equation lineaire");
     printf("\n\t\t\tC- Interpolations");
-    printf("\n\t\t\tD- Equation differentiel");
+    printf("\n\t\t\tD- Equations differentielles");
 
     do
     {
@@ -1545,7 +2040,7 @@ int main()
         choix_ini = toupper(choix_ini);
 
     }
-    while(choix_ini != 'A' && choix_ini != 'B' );
+    while(choix_ini != 'A' && choix_ini != 'B' && choix_ini != 'C' );
 
     switch(choix_ini)
     {
@@ -1554,6 +2049,9 @@ int main()
         break;
     case 'B':
         systeme_equation_lineaire();
+        break;
+    case 'C':
+        interpolation();
         break;
     }
     do
