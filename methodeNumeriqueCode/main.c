@@ -133,7 +133,6 @@ float derivee_f(float x)
 void dichotomie()
 {
     char rep;
-
     do
     {
         int iteration=0,k=0,trouve=0;
@@ -150,7 +149,8 @@ void dichotomie()
             tolerence=1/pow(10,tolerence);
             if (a==b) printf("\n\t\tSaisir a et b tel que (a<b).... Recommencez");
         }
-        while(a>b ||a==b);
+        while(a>b || a==b);
+
         printf("\n\t\tIntervalle i = [%lf ; %lf]\n", a, b);
         printf("\t\tf(%lf) = %lf et f(%lf) = %lf\n\n", a, f(a), b, f(b));
         if(fabs(f(b))<= tolerence && fabs(f(a))<= tolerence)
@@ -159,22 +159,21 @@ void dichotomie()
         }
         else if(fabs(f(a))<= tolerence)
         {
-            printf("\n\t\tLa solution est x= %.4f",a);
+            printf("\n\t\tLa solution est x = %.4f",a);
         }
         else if(fabs(f(b))<= tolerence)
         {
-            printf("\n\t\tLa solution est x= %.4f",b);
+            printf("\n\t\tLa solution est x = %.4f",b);
         }
         else if(f(a)*f(b)>0)
         {
-            printf("\n\t\tcette equation admet un nombre paire de solutions");
+            printf("\n\t\tCette equation admet un nombre paire de solutions");
             exit(0);
         }
         else
         {
             m = (b-a)/2;
             do
-
             {
                 k++;
                 if(f(m) == 0)
@@ -321,7 +320,6 @@ void lagrange()
 ///Point fixe
 void point_fixe()
 {
-
     char rep;
     do
     {
@@ -487,7 +485,6 @@ void newton()
     if(iteration == iter_max)
     {
         printf("La convergence n'est pas atteinte apr�s %d iterations", iteration);
-        exit(10);
     }
 }
 
@@ -1454,7 +1451,7 @@ float* choleskyInter(float** Mat,float* b,int n)
     for (i=0; i<n; i++) for (j=0; j<n; j++)
             if (Mat[i][j]!=Mat[j][i])
             {
-                printf("\n\n * La matrice saisie n est pas symetrique ,la methode de cholesky n est donc applicable\n");
+                printf("\n\n * La matrice saisie n est pas symetrique ,la methode n est donc applicable\n");
                 exit(EXIT_FAILURE);
             }
 
@@ -1889,11 +1886,11 @@ void TraitementKunta(float* TableauDesXi, float* TableauDesYi, int n, float xo, 
 //Euler modifie
 void TraitementEulerModifie(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h)
 {
-    printf("\n\t\t------------------------------------------------\n");
-    printf("\t\t--------------------------------------------------\n");
-    printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA   \n");
-    printf("\t\t--------------------------------------------------\n");
-    printf("\t\t--------------------------------------------------\n\n");
+    printf("\n\t\t--------------------------------------------------\n");
+    printf("\t\t----------------------------------------------------\n");
+    printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE EULER MODIFIEE   \n");
+    printf("\t\t----------------------------------------------------\n");
+    printf("\t\t----------------------------------------------------\n\n");
 
     int i;
     TableauDesXi[0] = xo;
@@ -1920,11 +1917,11 @@ void TraitementEulerModifie(float* TableauDesXi, float* TableauDesYi, int n, flo
 //Kunta ordre 4
 void TraitementKuntaOrdre4(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h)
 {
-    printf("\n\t\t------------------------------------------------\n");
-    printf("\t\t--------------------------------------------------\n");
-    printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA   \n");
-    printf("\t\t--------------------------------------------------\n");
-    printf("\t\t--------------------------------------------------\n\n");
+    printf("\n\t\t--------------------------------------------------------\n");
+    printf("\t\t----------------------------------------------------------\n");
+    printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA ORDRE 4   \n");
+    printf("\t\t----------------------------------------------------------\n");
+    printf("\t\t----------------------------------------------------------\n\n");
 
     int i;
     TableauDesXi[0] = xo;
@@ -1965,10 +1962,9 @@ void equation_lineaire()
     int choix_met;
     char rep;
     do{
-             system("cls");
+    system("cls");
 
     printf("\t\t*       LES METHODES DE RESOLUTION DES EQUATIONS NON LINEAIRES      *\n");
-
     printf("\n\t\t\t1- Dichotomie");
     printf("\n\t\t\t2- Lagrange");
     printf("\n\t\t\t3- Point fixe");
