@@ -96,33 +96,30 @@ int ctrsaisieint(void);
 float phi(float x)
 {
     float ans;
-    //ans = 2/(x-1);
-    ans = 2*x - 1;
-    //ans = sqrt(x+2);
-    //ans = -sqrt(x+2;
-    //ans =
+    ///ans = -(x*x) +1;
+    ///ans = sqrt(-x+1);
+    ///ans = -(sqrt(-x+1));
+    ans = 1/(x+1);
     return ans;
 }
 double f(double x) //image de la fonction
 {
     double ans;
-    //ans = x*x - x -2;
-    ans = (x-1)*(x-1);
+    ans = x*x + x -1;
     return ans;
 }
 
 double df(double x) //image de la derive
 {
     double ans;
-    //ans = 3*pow(x,2) - 18*x + 26;
-    ans = 2*x -2;
+    ans = 2*x + 1;
     return ans;
 }
 
 float derivee_f(float x)
 {
     float ans;
-    ans = 2*x -2;
+    ans = 2*x + 1;
     return ans;
 }
 //*************************
@@ -343,7 +340,9 @@ void point_fixe()
             {
                 i++;
                 m = phi(m);
-                printf("\n\t\t X%d = %.4f",i,m);
+                if(i == 1000){
+                    printf("\nLa methode ne connverge pas apres %d iterations", i);
+                    exit(10);                }
             }
 
             printf("\n\n\t\tLa solution est x = %.4f",m);
@@ -983,7 +982,7 @@ void gaussJordan(float A[19][19],float B[19],int n)
     {
         if (a[k][k]==0)
         {
-            printf("\n\n\t ??? Un des pivots est nul alors la methode de Gauss pivot partiel est non applicable, utilisez une autre methode...\n\n");
+            printf("\n\n\t ??? Un des pivots est nul alors la methode de Gauss jordan est non applicable, utilisez une autre methode...\n\n");
         }
 
         p=a[k][k];
@@ -1668,7 +1667,7 @@ float* CalculCoefDeN(int n, float* x, float* y)
 ///Lagrange
 void Lagrange(int n,float* x, float* y)
 {
-    
+
     printf("\n\t\t-------------------------------------------------------\n");
     printf("\t\t-------------------------------------------------------\n");
     printf("\t\t  INTERPOLATION LINEAIRE PAR LA METHODE DE LAGRANGE   \n");
@@ -1720,7 +1719,7 @@ void Lagrange(int n,float* x, float* y)
 //Newton
 void Newton(int n, float* x, float* y)
 {
-    
+
     printf("\n\t\t-------------------------------------------------------\n");
     printf("\t\t-------------------------------------------------------\n");
     printf("\t\t  INTERPOLATION LINEAIRE PAR LA METHODE DE NEWTON   \n");
@@ -1769,7 +1768,7 @@ void Moindre(int n, float* x, float* y)
     printf("\t\t  INTERPOLATION LINEAIRE PAR LA METHODE DE MOINDRES CARREES   \n");
     printf("\t\t------------------------------------------------------------\n");
     printf("\t\t------------------------------------------------------------\n\n");
-    
+
     int i,p,puis;
     do
     {
@@ -1823,7 +1822,7 @@ float FonctionDerivee(float x, float y)
 //Euler
 void TraitementEuler(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h)
 {
-    
+
         printf("\n\t\t--------------------------------------------\n");
         printf("\t\t----------------------------------------------\n");
         printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE EULER   \n");
@@ -1854,7 +1853,7 @@ void TraitementEuler(float* TableauDesXi, float* TableauDesYi, int n, float xo, 
 //Kunta
 void TraitementKunta(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h)
 {
-    
+
     printf("\n\t\t------------------------------------------------\n");
     printf("\t\t--------------------------------------------------\n");
     printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA   \n");
