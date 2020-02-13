@@ -75,6 +75,8 @@ void equaDif();
 //fonctions principales
 void TraitementEuler(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h);
 void TraitementKunta(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h);
+void TraitementEulerModifie(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h);
+void TraitementKuntaOrdre4(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h);
 //fonctions particulieres
 //suites
 float SuiteDeleur(float h, float xn, float yn);
@@ -1856,11 +1858,11 @@ void TraitementEuler(float* TableauDesXi, float* TableauDesYi, int n, float xo, 
 void TraitementKunta(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h)
 {
     
-        printf("\n\t\t------------------------------------------------\n");
-        printf("\t\t--------------------------------------------------\n");
-        printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA   \n");
-        printf("\t\t--------------------------------------------------\n");
-        printf("\t\t--------------------------------------------------\n\n");
+    printf("\n\t\t------------------------------------------------\n");
+    printf("\t\t--------------------------------------------------\n");
+    printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA   \n");
+    printf("\t\t--------------------------------------------------\n");
+    printf("\t\t--------------------------------------------------\n\n");
 
     int i;
     TableauDesXi[0] = xo;
@@ -1884,6 +1886,69 @@ void TraitementKunta(float* TableauDesXi, float* TableauDesYi, int n, float xo, 
     }
 }
 
+//Euler modifie
+void TraitementEulerModifie(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h)
+{
+    printf("\n\t\t------------------------------------------------\n");
+    printf("\t\t--------------------------------------------------\n");
+    printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA   \n");
+    printf("\t\t--------------------------------------------------\n");
+    printf("\t\t--------------------------------------------------\n\n");
+
+    int i;
+    TableauDesXi[0] = xo;
+    TableauDesYi[0] = yo;
+    for(i = 0; i < n; i++)
+    {
+        TableauDesXi[i+1] = h + TableauDesXi[i];
+        TableauDesYi[i+1] = SuiteDeKunta(h, TableauDesXi[i], TableauDesYi[i]);
+    }
+    printf("\nXi\t|");
+    for(i = 0; i <n; i++)
+    {
+        printf("\t%.2f |",TableauDesXi[i]);
+
+    }
+    printf("\n\t--------------------------------------------------\n");
+    printf("Yi\t|");
+    for(i = 0; i <n; i++)
+    {
+        printf("\t%.2f |",TableauDesYi[i]);
+    }
+}
+
+//Kunta ordre 4
+void TraitementKuntaOrdre4(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h)
+{
+    printf("\n\t\t------------------------------------------------\n");
+    printf("\t\t--------------------------------------------------\n");
+    printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA   \n");
+    printf("\t\t--------------------------------------------------\n");
+    printf("\t\t--------------------------------------------------\n\n");
+
+    int i;
+    TableauDesXi[0] = xo;
+    TableauDesYi[0] = yo;
+    h = h/2;
+    for(i = 0; i < n; i++)
+    {
+        TableauDesXi[i+1] = h + TableauDesXi[i];
+        TableauDesYi[i+1] = SuiteDeleur(h, TableauDesXi[i], TableauDesYi[i]);
+    }
+    printf("\nXi\t|");
+    for(i = 0; i <n; i++)
+    {
+        printf("\t%.2f |",TableauDesXi[i]);
+
+    }
+    printf("\n\t--------------------------------------------------\n");
+    printf("Yi\t|");
+    for(i = 0; i <n; i++)
+    {
+        printf("\t%.2f |",TableauDesYi[i]);
+    }
+
+}
 
 ///*********************************************************************
 ///************************************************                     *********
@@ -2158,6 +2223,8 @@ void equaDif()
         printf("\n\t\t*       LES METHODES D EQUATIONS DIFFERENTIELLES      *\n");
         printf("\n\t\t\t1- METHODE DE EULER");
         printf("\n\t\t\t2- METHODE DE RUNGE KUNTA");
+        printf("\n\t\t\t3- METHODE DE EULER MODIFIE");
+        printf("\n\t\t\t4- METHODE DE RUNGE KUNTA ORDRE 4");
 
         do
         {
@@ -2165,7 +2232,7 @@ void equaDif()
             scanf("%d", &choix_met);
             fflush(stdin);
         }
-        while( choix_met < 1 || choix_met > 2);
+        while( choix_met < 1 || choix_met > 4);
 
         switch(choix_met)
         {
@@ -2174,6 +2241,12 @@ void equaDif()
             break;
         case 2 :
             TraitementKunta(TableauDesXi, TableauDesYi, n, xo, yo, h);
+            break;
+        case 3 :
+            TraitementEulerModifie(TableauDesXi, TableauDesYi, n, xo, yo, h);
+            break;
+        case 4 :
+            TraitementKuntaOrdre4(TableauDesXi, TableauDesYi, n, xo, yo, h);
             break;
         }
 
