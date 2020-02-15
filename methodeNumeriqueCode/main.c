@@ -840,11 +840,12 @@ void gauss(float A[19][19],float B[19],int n)
     float x[19],p,s;
     int i,j,k;
 
-    for(k=0; k<n-1; k++)
+    for(k=0; k<n; k++)
     {
         if (a[k][k]==0)
         {
             printf("\n\n\tUn des pivots est nul alors la methode de Gauss simple est non applicable, utilisez une autre methode...\n\n");
+            exit(10);
         }
 
         //reduction
@@ -898,7 +899,7 @@ void gaussPivot(float A[19][19],float B[19],int n)
     float x[19],p,s,ref,temp;
     int i,j,k,ligne;
 
-    for(k=0; k<n-1; k++)
+    for(k=0; k<n; k++)
     {
     // pivot maximum
         ref=0;
@@ -923,6 +924,7 @@ void gaussPivot(float A[19][19],float B[19],int n)
         if (a[k][k]==0)
         {
             printf("\n\n\t ??? Un des pivots est nul alors la methode de Gauss pivot partiel est non applicable, utilisez une autre methode...\n\n");
+            exit(10);
         }
 
         //triangularisation
@@ -983,6 +985,7 @@ void gaussJordan(float A[19][19],float B[19],int n)
         if (a[k][k]==0)
         {
             printf("\n\n\t ??? Un des pivots est nul alors la methode de Gauss jordan est non applicable, utilisez une autre methode...\n\n");
+            exit(10);
         }
 
         p=a[k][k];
@@ -1058,6 +1061,7 @@ void crout(float A[19][19],float B[19],int n)
         if (L[k][k]==0)
         {
             printf("\n\n\t\t* Un mineur nul ! => methode de LU n'est pas applicable. Utilisez une autre methode.\n\n");
+            exit(10);
         }
 
         for (j=m+1; j<n; j++)
@@ -1139,6 +1143,7 @@ void doolittle(float A[19][19],float B[19],int n)
         if (U[k][k]==0)
         {
             printf("\n\n\t\tUn mineur nul ! => methode de LU non applicable\n\n");
+            exit(10);
         }
 
         for (i=m+1; i<n; i++)
@@ -1207,6 +1212,7 @@ void cholesky(float A[19][19],float B[19],int n)
             if (a[i][j]!=a[j][i])
             {
                 printf("\n\n\t\t* Matrice non symetrique => methode de Cholesky non applicable; saisir une autre matrice ou changer de methode\n\n");
+                exit(10);
             }
 
     for (i=0; i<n; i++) for (j=0; j<n; j++) L[i][j]=0;
@@ -1220,6 +1226,7 @@ void cholesky(float A[19][19],float B[19],int n)
         if (p<=0)
         {
             printf("\n\n\t\t* Matrice non definie positive => methode de Cholesky non applicable; saisir une autre matrice ou changer de methode\n\n");
+            exit(10);
         }
 
         L[i][i]=sqrt(p);
