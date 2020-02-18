@@ -1208,10 +1208,10 @@ void cholesky(float A[19][19],float B[19],int n)
 
     // verification de le symetrie
     for (i=0; i<n; i++) for (j=0; j<n; j++)
-            if (a[i][j]!=a[j][i])
-            {
-                printf("\n\n\t\t* Matrice non symetrique => methode de Cholesky non applicable; saisir une autre matrice ou changer de methode\n\n");
-            }
+    if (a[i][j]!=a[j][i])
+    {
+        printf("\n\n\t\t* Matrice non symetrique => methode de Cholesky non applicable; saisir une autre matrice ou changer de methode\n\n");
+    }
 
     for (i=0; i<n; i++) for (j=0; j<n; j++) L[i][j]=0;
 
