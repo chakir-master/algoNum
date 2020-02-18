@@ -100,7 +100,11 @@ float phi(float x)
     //ans = 2*x - 1;
     //ans = sqrt(x+2);
     //ans = -sqrt(x+2;
-    ans = 1 / (x+1);
+    ///ans = 1 / (x+1);
+    ///ans = -(x*x) +1;
+    ///ans = sqrt(-x+1);
+    ///ans = -(sqrt(-x+1));
+    ans = 1/(x+1);
     return ans;
 }
 double f(double x) //image de la fonction
@@ -122,7 +126,7 @@ double df(double x) //image de la derive
 float derivee_f(float x)
 {
     float ans;
-    ans = 2*x +1;
+    ans = 2*x + 1;
     return ans;
 }
 //*************************
@@ -133,7 +137,6 @@ float derivee_f(float x)
 void dichotomie()
 {
     char rep;
-
     do
     {
         int iteration=0,k=0,trouve=0;
@@ -150,7 +153,8 @@ void dichotomie()
             tolerence=1/pow(10,tolerence);
             if (a==b) printf("\n\t\tSaisir a et b tel que (a<b).... Recommencez");
         }
-        while(a>b ||a==b);
+        while(a>b || a==b);
+
         printf("\n\t\tIntervalle i = [%lf ; %lf]\n", a, b);
         printf("\t\tf(%lf) = %lf et f(%lf) = %lf\n\n", a, f(a), b, f(b));
         if(fabs(f(b))<= tolerence && fabs(f(a))<= tolerence)
@@ -159,22 +163,21 @@ void dichotomie()
         }
         else if(fabs(f(a))<= tolerence)
         {
-            printf("\n\t\tLa solution est x= %.4f",a);
+            printf("\n\t\tLa solution est x = %.4f",a);
         }
         else if(fabs(f(b))<= tolerence)
         {
-            printf("\n\t\tLa solution est x= %.4f",b);
+            printf("\n\t\tLa solution est x = %.4f",b);
         }
         else if(f(a)*f(b)>0)
         {
-            printf("\n\t\tcette equation admet un nombre paire de solutions");
+            printf("\n\t\tCette equation admet un nombre paire de solutions");
             exit(0);
         }
         else
         {
             m = (b-a)/2;
             do
-
             {
                 k++;
                 if(f(m) == 0)
@@ -321,7 +324,6 @@ void lagrange()
 ///Point fixe
 void point_fixe()
 {
-
     char rep;
     do
     {
@@ -345,7 +347,9 @@ void point_fixe()
             {
                 i++;
                 m = phi(m);
-                printf("\n\t\t X%d = %.4f",i,m);
+                if(i == 1000){
+                    printf("\nLa methode ne connverge pas apres %d iterations", i);
+                    exit(10);                }
             }
 
             printf("\n\n\t\tLa solution est x = %.4f",m);
@@ -487,7 +491,6 @@ void newton()
     if(iteration == iter_max)
     {
         printf("La convergence n'est pas atteinte apr�s %d iterations", iteration);
-        exit(10);
     }
 }
 
@@ -844,11 +847,12 @@ void gauss(float A[19][19],float B[19],int n)
     float x[19],p,s;
     int i,j,k;
 
-    for(k=0; k<n-1; k++)
+    for(k=0; k<n; k++)
     {
         if (a[k][k]==0)
         {
             printf("\n\n\tUn des pivots est nul alors la methode de Gauss simple est non applicable, utilisez une autre methode...\n\n");
+            exit(10);
         }
 
         //reduction
@@ -902,7 +906,7 @@ void gaussPivot(float A[19][19],float B[19],int n)
     float x[19],p,s,ref,temp;
     int i,j,k,ligne;
 
-    for(k=0; k<n-1; k++)
+    for(k=0; k<n; k++)
     {
     // pivot maximum
         ref=0;
@@ -927,6 +931,7 @@ void gaussPivot(float A[19][19],float B[19],int n)
         if (a[k][k]==0)
         {
             printf("\n\n\t ??? Un des pivots est nul alors la methode de Gauss pivot partiel est non applicable, utilisez une autre methode...\n\n");
+            exit(10);
         }
 
         //triangularisation
@@ -986,7 +991,8 @@ void gaussJordan(float A[19][19],float B[19],int n)
     {
         if (a[k][k]==0)
         {
-            printf("\n\n\t ??? Un des pivots est nul alors la methode de Gauss pivot partiel est non applicable, utilisez une autre methode...\n\n");
+            printf("\n\n\t ??? Un des pivots est nul alors la methode de Gauss jordan est non applicable, utilisez une autre methode...\n\n");
+            exit(10);
         }
 
         p=a[k][k];
@@ -1062,6 +1068,7 @@ void crout(float A[19][19],float B[19],int n)
         if (L[k][k]==0)
         {
             printf("\n\n\t\t* Un mineur nul ! => methode de LU n'est pas applicable. Utilisez une autre methode.\n\n");
+            exit(10);
         }
 
         for (j=m+1; j<n; j++)
@@ -1143,6 +1150,7 @@ void doolittle(float A[19][19],float B[19],int n)
         if (U[k][k]==0)
         {
             printf("\n\n\t\tUn mineur nul ! => methode de LU non applicable\n\n");
+            exit(10);
         }
 
         for (i=m+1; i<n; i++)
@@ -1208,10 +1216,11 @@ void cholesky(float A[19][19],float B[19],int n)
 
     // verification de le symetrie
     for (i=0; i<n; i++) for (j=0; j<n; j++)
-    if (a[i][j]!=a[j][i])
-    {
-        printf("\n\n\t\t* Matrice non symetrique => methode de Cholesky non applicable; saisir une autre matrice ou changer de methode\n\n");
-    }
+            if (a[i][j]!=a[j][i])
+            {
+                printf("\n\n\t\t* Matrice non symetrique => methode de Cholesky non applicable; saisir une autre matrice ou changer de methode\n\n");
+                exit(10);
+            }
 
     for (i=0; i<n; i++) for (j=0; j<n; j++) L[i][j]=0;
 
@@ -1224,6 +1233,7 @@ void cholesky(float A[19][19],float B[19],int n)
         if (p<=0)
         {
             printf("\n\n\t\t* Matrice non definie positive => methode de Cholesky non applicable; saisir une autre matrice ou changer de methode\n\n");
+            exit(10);
         }
 
         L[i][i]=sqrt(p);
@@ -1471,7 +1481,7 @@ float* choleskyInter(float** Mat,float* b,int n)
     for (i=0; i<n; i++) for (j=0; j<n; j++)
             if (Mat[i][j]!=Mat[j][i])
             {
-                printf("\n\n * La matrice saisie n est pas symetrique ,la methode de cholesky n est donc applicable\n");
+                printf("\n\n * La matrice saisie n est pas symetrique ,la methode n est donc applicable\n");
                 exit(EXIT_FAILURE);
             }
 
@@ -1688,7 +1698,7 @@ float* CalculCoefDeN(int n, float* x, float* y)
 ///Lagrange
 void Lagrange(int n,float* x, float* y)
 {
-    
+
     printf("\n\t\t-------------------------------------------------------\n");
     printf("\t\t-------------------------------------------------------\n");
     printf("\t\t  INTERPOLATION LINEAIRE PAR LA METHODE DE LAGRANGE   \n");
@@ -1740,7 +1750,7 @@ void Lagrange(int n,float* x, float* y)
 //Newton
 void Newton(int n, float* x, float* y)
 {
-    
+
     printf("\n\t\t-------------------------------------------------------\n");
     printf("\t\t-------------------------------------------------------\n");
     printf("\t\t  INTERPOLATION LINEAIRE PAR LA METHODE DE NEWTON   \n");
@@ -1789,7 +1799,7 @@ void Moindre(int n, float* x, float* y)
     printf("\t\t  INTERPOLATION LINEAIRE PAR LA METHODE DE MOINDRES CARREES   \n");
     printf("\t\t------------------------------------------------------------\n");
     printf("\t\t------------------------------------------------------------\n\n");
-    
+
     int i,p,puis;
     do
     {
@@ -1843,7 +1853,7 @@ float FonctionDerivee(float x, float y)
 //Euler
 void TraitementEuler(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h)
 {
-    
+
         printf("\n\t\t--------------------------------------------\n");
         printf("\t\t----------------------------------------------\n");
         printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE EULER   \n");
@@ -1874,7 +1884,7 @@ void TraitementEuler(float* TableauDesXi, float* TableauDesYi, int n, float xo, 
 //Kunta
 void TraitementKunta(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h)
 {
-    
+
     printf("\n\t\t------------------------------------------------\n");
     printf("\t\t--------------------------------------------------\n");
     printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA   \n");
@@ -1906,11 +1916,11 @@ void TraitementKunta(float* TableauDesXi, float* TableauDesYi, int n, float xo, 
 //Euler modifie
 void TraitementEulerModifie(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h)
 {
-    printf("\n\t\t------------------------------------------------\n");
-    printf("\t\t--------------------------------------------------\n");
-    printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA   \n");
-    printf("\t\t--------------------------------------------------\n");
-    printf("\t\t--------------------------------------------------\n\n");
+    printf("\n\t\t--------------------------------------------------\n");
+    printf("\t\t----------------------------------------------------\n");
+    printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE EULER MODIFIEE   \n");
+    printf("\t\t----------------------------------------------------\n");
+    printf("\t\t----------------------------------------------------\n\n");
 
     int i;
     TableauDesXi[0] = xo;
@@ -1937,11 +1947,11 @@ void TraitementEulerModifie(float* TableauDesXi, float* TableauDesYi, int n, flo
 //Kunta ordre 4
 void TraitementKuntaOrdre4(float* TableauDesXi, float* TableauDesYi, int n, float xo, float yo,  float h)
 {
-    printf("\n\t\t------------------------------------------------\n");
-    printf("\t\t--------------------------------------------------\n");
-    printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA   \n");
-    printf("\t\t--------------------------------------------------\n");
-    printf("\t\t--------------------------------------------------\n\n");
+    printf("\n\t\t--------------------------------------------------------\n");
+    printf("\t\t----------------------------------------------------------\n");
+    printf("\t\t  EQUATION LINEAIRE PAR LA METHODE DE RUNGE KUNTA ORDRE 4   \n");
+    printf("\t\t----------------------------------------------------------\n");
+    printf("\t\t----------------------------------------------------------\n\n");
 
     int i;
     TableauDesXi[0] = xo;
@@ -1982,10 +1992,9 @@ void equation_lineaire()
     int choix_met;
     char rep;
     do{
-             system("cls");
+    system("cls");
 
     printf("\t\t*       LES METHODES DE RESOLUTION DES EQUATIONS NON LINEAIRES      *\n");
-
     printf("\n\t\t\t1- Dichotomie");
     printf("\n\t\t\t2- Lagrange");
     printf("\n\t\t\t3- Point fixe");
