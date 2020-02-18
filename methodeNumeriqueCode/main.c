@@ -97,17 +97,17 @@ float phi(float x)
 {
     float ans;
     //ans = 2/(x-1);
-    ans = 2*x - 1;
+    //ans = 2*x - 1;
     //ans = sqrt(x+2);
     //ans = -sqrt(x+2;
-    //ans =
+    ans = 1 / (x+1);
     return ans;
 }
 double f(double x) //image de la fonction
 {
     double ans;
-    //ans = x*x - x -2;
-    ans = (x-1)*(x-1);
+    ans = x*x + x - 1;
+    //ans = (x-1)*(x-1);
     return ans;
 }
 
@@ -115,14 +115,14 @@ double df(double x) //image de la derive
 {
     double ans;
     //ans = 3*pow(x,2) - 18*x + 26;
-    ans = 2*x -2;
+    ans = 2*x + 1;
     return ans;
 }
 
 float derivee_f(float x)
 {
     float ans;
-    ans = 2*x -2;
+    ans = 2*x +1;
     return ans;
 }
 //*************************
@@ -1312,13 +1312,21 @@ void jacobie(float A[19][19],float B[19],int n)
             x1[k]=x2[k];
         }
 
+        if(norme(x,n)<eps)
+        {
+            printf("La methode a convergé apres %d iterations.\n", iter);
+            printf("\n\t\t* Resultat :\n\n");
+            for (i=0; i<n; i++) printf("\t\tX[%d] = %f ;\n",i+1,x2[i]);
+            printf("\n\t\t* %d iterations,  10^-4 pres \n",iter);
+        }
+
         iter++;
     }
-    while (norme(x,n)>eps) ;
+    while (norme(x,n)>eps && (iter!=100)) ;
 
-    printf("\n\t\t* Resultat :\n\n");
-    for (i=0; i<n; i++) printf("\t\tX[%d] = %f ;\n",i+1,x2[i]);
-    printf("\n\t\t* %d iterations,  10^-4 pres \n",iter);
+    if(iter == 100){
+        printf("\nLa methode ne converge pas, apres %d iterations..", iter);
+    }
 }
 
 //Gauss Seidel
@@ -1373,13 +1381,22 @@ void gaussSeidel(float A[19][19],float B[19],int n)
             x1[k]=x2[k];
         }
 
+        if(norme(x,n)<eps)
+        {
+            printf("La methode a convergé apres %d iterations.\n", iter);
+            printf("\n\t\t* Resultat :\n\n");
+            for (i=0; i<n; i++) printf("\t\tX[%d] = %f ;\n",i+1,x2[i]);
+            printf("\n\t\t* %d iterations,  10^-4 pres \n",iter);
+        }
+
         iter++;
     }
-    while (norme(x,n)>eps) ;
+    while (norme(x,n)>eps && (iter!=100)) ;
 
-    printf("\n\t\t* Resultat :\n\n");
-    for (i=0; i<n; i++) printf(" X_%d = %.2f ;\n",i+1,x2[i]);
-    printf("\n\t\t %d iterationS, 10^-4 pres. \n",iter);
+    if(iter == 100)
+    {
+        printf("\nLa methode ne converge pas, apres %d iterations..", iter);
+    }
 }
 
 
